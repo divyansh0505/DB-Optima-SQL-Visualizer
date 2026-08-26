@@ -1,0 +1,709 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Google Fonts ──────────────────────────────────────────────
+   Loaded via next/font in layout.tsx for optimal performance.
+   These @font-face blocks are fallbacks for dynamic import.    */
+
+/* ── Theme Tokens ──────────────────────────────────────────────
+   effect. `--bg` is the deep canvas everything sits on.          */
+
+:root {
+  /* Canvas */
+  --bg: #09090b;
+  --bg-gradient: none;
+
+  /* Surfaces */
+  --surface: #18181b;
+  --surface2: #27272a;
+  --surface3: #3f3f46;
+  --surface-solid: #18181b;
+
+  /* Typography */
+  --text: #f4f4f5;
+  --text-secondary: #d4d4d8;
+  --muted: #a1a1aa;
+  --muted2: #71717a;
+
+  /* Accent — Electric Blue */
+  --accent: #3b82f6;
+  --accent-hover: #2563eb;
+  --accent-soft: rgba(59, 130, 246, 0.1);
+  --accent-glow: transparent;
+
+  /* Accent 2 — Cyan -> Muted Blue */
+  --accent-cyan: #60a5fa;
+  --accent-cyan-soft: rgba(96, 165, 250, 0.1);
+
+  /* Accent 3 — Violet -> Gray */
+  --accent-violet: #9ca3af;
+  --accent-violet-soft: rgba(156, 163, 175, 0.1);
+
+  /* Accent 4 — Amber -> Soft Orange */
+  --accent-amber: #f97316;
+  --accent-amber-soft: rgba(249, 115, 22, 0.1);
+
+  /* Accent 5 — Teal -> Slate */
+  --accent-teal: #94a3b8;
+
+  /* Status */
+  --success: #10b981;
+  --success-soft: rgba(16, 185, 129, 0.1);
+  --warning: #f59e0b;
+  --warning-soft: rgba(245, 158, 11, 0.1);
+  --error: #ef4444;
+  --error-soft: rgba(239, 68, 68, 0.1);
+
+  /* Borders — Crisp, solid lines */
+  --border: #27272a;
+  --border2: #3f3f46;
+  --border-subtle: #27272a;
+  --border-glow: transparent;
+
+  /* Shadows & Glows */
+  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.5), 0 1px 2px -1px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.5);
+  --shadow-glow: none;
+  --shadow-inset: none;
+
+  /* Radius */
+  --radius-xl: 8px;
+  --radius-lg: 6px;
+  --radius-md: 4px;
+  --radius-sm: 2px;
+
+  /* Blur */
+  --blur-glass: 0px;
+  --blur-heavy: 0px;
+  /* Scrollbar */
+  --scrollbar-thumb: #3f3f46;
+}
+
+:root[data-theme="light"] {
+  /* Canvas */
+  --bg: #fafafa;
+  --bg-gradient: none;
+
+  /* Surfaces */
+  --surface: #ffffff;
+  --surface2: #f4f4f5;
+  --surface3: #e4e4e7;
+  --surface-solid: #ffffff;
+
+  /* Typography */
+  --text: #09090b;
+  --text-secondary: #3f3f46;
+  --muted: #71717a;
+  --muted2: #a1a1aa;
+
+  /* Accent */
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-soft: rgba(37, 99, 235, 0.1);
+  --accent-glow: transparent;
+
+  /* Accent 2 */
+  --accent-cyan: #3b82f6;
+  --accent-cyan-soft: rgba(59, 130, 246, 0.1);
+
+  /* Accent 3 */
+  --accent-violet: #64748b;
+  --accent-violet-soft: rgba(100, 116, 139, 0.1);
+
+  /* Accent 4 */
+  --accent-amber: #ea580c;
+  --accent-amber-soft: rgba(234, 88, 12, 0.1);
+
+  /* Accent 5 */
+  --accent-teal: #475569;
+
+  /* Status */
+  --success: #059669;
+  --success-soft: rgba(5, 150, 105, 0.1);
+  --warning: #d97706;
+  --warning-soft: rgba(217, 119, 6, 0.1);
+  --error: #dc2626;
+  --error-soft: rgba(220, 38, 38, 0.1);
+
+  /* Borders */
+  --border: #e4e4e7;
+  --border2: #d4d4d8;
+  --border-subtle: #f4f4f5;
+  --border-glow: transparent;
+
+  /* Shadows & Glows */
+  --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-glow: none;
+  --shadow-inset: none;
+
+  /* Scrollbar */
+  --scrollbar-thumb: #d4d4d8;
+}
+
+/* ── Base ─────────────────────────────────────────────────── */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--bg);
+  background-image: var(--bg-gradient);
+  background-attachment: fixed;
+  color: var(--text);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ── Scrollbar ────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-soft);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+
+/* ── Selection ────────────────────────────────────────────── */
+::selection {
+  background-color: var(--accent);
+  color: white;
+}
+
+/* ── Focus Ring ───────────────────────────────────────────── */
+*:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ── Keyframe Animations ──────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.8); opacity: 0.5; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 20px -5px var(--accent-glow); }
+  50% { box-shadow: 0 0 30px -2px var(--accent-glow); }
+}
+
+@keyframes gradient-rotate {
+  0% { --angle: 0deg; }
+  100% { --angle: 360deg; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes count-up {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.35s ease-out forwards;
+}
+
+.animate-fade-in-scale {
+  animation: fadeInScale 0.3s ease-out forwards;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.25s ease-out forwards;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.25s ease-out forwards;
+}
+
+.animate-spin-slow {
+  animation: spin 1.5s linear infinite;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent 30%, rgba(59,130,246,0.05) 50%, transparent 70%);
+  background-size: 200% 100%;
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* ── Component Utilities ──────────────────────────────────── */
+@layer components {
+
+  /* ── Glass Card ──────────────────────────────────────────
+     Frosted-glass panel with subtle border and glow shadow.
+     Each card variant gets a distinct accent-colored top edge
+     so adjacent panels read as separate, meaningful areas.   */
+  .card {
+    background: var(--surface);
+    backdrop-filter: blur(var(--blur-glass));
+    -webkit-backdrop-filter: blur(var(--blur-glass));
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow), var(--shadow-inset);
+    transition: box-shadow 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+    pointer-events: none;
+  }
+
+  .card:hover {
+    box-shadow: var(--shadow-lg), var(--shadow-inset);
+    border-color: var(--border-glow);
+  }
+
+  .card-accent-blue {
+    border-top: 2px solid var(--accent);
+  }
+  .card-accent-violet {
+    border-top: 2px solid var(--accent-violet);
+  }
+  .card-accent-teal {
+    border-top: 2px solid var(--accent-teal);
+  }
+  .card-accent-amber {
+    border-top: 2px solid var(--accent-amber);
+  }
+  .card-accent-success {
+    border-top: 2px solid var(--success);
+  }
+
+  .panel-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+
+  .panel-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    flex-shrink: 0;
+    box-shadow: 0 0 8px currentColor;
+  }
+
+  /* ── Buttons ──────────────────────────────────────────── */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    padding: 0.55rem 1.1rem;
+    background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+    color: white;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(255,255,255,0.15);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.1) inset,
+                0 4px 16px -4px var(--accent-glow);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-primary::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.1) inset,
+                0 8px 24px -4px var(--accent-glow);
+  }
+
+  .btn-primary:hover:not(:disabled)::before {
+    opacity: 1;
+  }
+
+  .btn-primary:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    padding: 0.55rem 1.1rem;
+    background: var(--surface2);
+    backdrop-filter: blur(8px);
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border2);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-secondary:hover:not(:disabled) {
+    background: var(--surface3);
+    border-color: var(--accent);
+    color: var(--accent);
+    box-shadow: 0 0 20px -5px var(--accent-glow);
+  }
+
+  .btn-secondary:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+
+  .btn-secondary:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  /* Outlined "special action" button — used for things like Run Demo,
+     that shouldn't compete with the primary accent color. */
+  .btn-outline-violet {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.95rem;
+    background: var(--accent-violet-soft);
+    color: var(--accent-violet);
+    font-size: 0.78rem;
+    font-weight: 700;
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(167, 139, 250, 0.3);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-outline-violet:hover:not(:disabled) {
+    background: rgba(167, 139, 250, 0.18);
+    transform: translateY(-1px);
+    box-shadow: 0 0 20px -5px rgba(167, 139, 250, 0.25);
+  }
+
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.7rem;
+    background: transparent;
+    color: var(--muted);
+    font-size: 0.78rem;
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-ghost:hover:not(:disabled) {
+    background: var(--surface3);
+    color: var(--text);
+    border-color: var(--border2);
+  }
+
+  .btn-danger-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.2rem 0.4rem;
+    background: transparent;
+    color: var(--muted);
+    font-size: 0.7rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .btn-danger-ghost:hover {
+    background: var(--error-soft);
+    color: var(--error);
+    border-color: rgba(248, 113, 113, 0.3);
+  }
+
+  .input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    background: var(--surface-solid);
+    color: var(--text);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft), var(--shadow-glow);
+  }
+
+  .input::placeholder {
+    color: var(--muted2);
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.125rem 0.5rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+  }
+
+  .badge-success {
+    background: var(--success-soft);
+    color: var(--success);
+    border: 1px solid rgba(52, 211, 153, 0.25);
+  }
+
+  .badge-warning {
+    background: var(--warning-soft);
+    color: var(--warning);
+    border: 1px solid rgba(251, 191, 36, 0.25);
+  }
+
+  .badge-error {
+    background: var(--error-soft);
+    color: var(--error);
+    border: 1px solid rgba(248, 113, 113, 0.25);
+  }
+
+  .badge-info {
+    background: var(--accent-soft);
+    color: var(--accent);
+    border: 1px solid rgba(129, 140, 248, 0.25);
+  }
+
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border2), transparent);
+    margin: 1rem 0;
+  }
+
+  .code-block {
+    background: var(--surface-solid);
+    border: 1px solid var(--border2);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Monaco, Consolas, monospace;
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    overflow-x: auto;
+  }
+
+  .tooltip {
+    position: relative;
+  }
+
+  .tooltip::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-6px);
+    padding: 0.3rem 0.6rem;
+    background: var(--surface-solid);
+    color: var(--text);
+    font-size: 0.72rem;
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
+    border: 1px solid var(--border2);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(var(--blur-glass));
+  }
+
+  .tooltip:hover::after {
+    opacity: 1;
+  }
+
+  /* ── Glass Panel ─────────────────────────────────────── */
+  .glass-panel {
+    background: var(--surface);
+    backdrop-filter: blur(var(--blur-glass));
+    -webkit-backdrop-filter: blur(var(--blur-glass));
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+
+  /* ── Skeleton Loader ─────────────────────────────────── */
+  .skeleton {
+    background: linear-gradient(90deg, var(--surface3) 25%, var(--surface2) 50%, var(--surface3) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
+    border-radius: var(--radius-sm);
+  }
+}
+
+/* ── Prism Editor Override ────────────────────────────────── */
+.prism-editor textarea {
+  outline: none !important;
+}
+
+.prism-editor textarea::selection {
+  background-color: var(--accent) !important;
+  color: white !important;
+}
+
+/* Prism's SQL grammar only assigns token *classes* — it ships no colors
+   itself. Without a theme, every token renders in the default text color
+   (which is why the editor looked completely unhighlighted). These match
+   the same palette highlightSQL() already uses for the read-only preview,
+   so the editable and read-only views look consistent. */
+.prism-editor .token.keyword {
+  color: #3b82f6;
+  font-weight: bold;
+}
+.prism-editor .token.function {
+  color: #22d3ee;
+}
+.prism-editor .token.string {
+  color: #34d399;
+}
+.prism-editor .token.number,
+.prism-editor .token.boolean {
+  color: #f472b6;
+}
+.prism-editor .token.comment {
+  color: #4a5170;
+  font-style: italic;
+}
+.prism-editor .token.operator,
+.prism-editor .token.punctuation {
+  color: var(--muted);
+}
+
+/* ── Recharts Override ──────────────────────────────────── */
+.recharts-tooltip-wrapper {
+  outline: none !important;
+}
+
+.recharts-default-tooltip {
+  background: var(--surface-solid) !important;
+  border: 1px solid var(--border2) !important;
+  border-radius: var(--radius-md) !important;
+  color: var(--text) !important;
+  backdrop-filter: blur(var(--blur-glass)) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+/* ── Responsive Helpers ───────────────────────────────────── */
+@media (max-width: 1024px) {
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+@media (min-width: 1025px) {
+  .hide-desktop {
+    display: none !important;
+  }
+}
+
+/* ── Noise texture overlay ────────────────────────────────── */
+.noise-overlay::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  opacity: 0.015;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1000;
+}
