@@ -144,6 +144,7 @@ export function parsePipeline(sql: string): PipelineStep[] {
     steps.push({ type: "WINDOW", status: "pending" });
   }
 
+  if (steps.length === 0) return [];
   steps.push({ type: "SELECT", status: "pending" });
   return steps;
 }

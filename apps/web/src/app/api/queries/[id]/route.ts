@@ -1,99 +1,46 @@
-// ── Database / Schema ─────────────────────────────────────────
-export type CellValue = string | number | null;
+import { NextRequest, NextResponse } from "next/server";
+import { eq } from "drizzle-orm";
 
-export interface TableRow {
-  [column: string]: CellValue;
-}
+export const runtime = "nodejs";
 
-export interface TableData {
-  [tableName: string]: TableRow[];
-}
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    if (!process.env.DATABASE_URL) {
+      return NextResponse.json(
+        {
+          error: "Saving is not configured",
+          message:
+            "Set DATABASE_URL (see docker/docker-compose.yml) to enable saved/shareable queries.",
+        },
+        { status: 501 }
+      );
+    }
 
-// ── SQL Execution Pipeline ─────────────────────────────────────
-export type PipelineStepType = "FROM" | "JOIN" | "WHERE" | "SELECT";
-export type PipelineStepStatus = "pending" | "active" | "done";
+    const { db } = await import("@db-optima/database");
+    const { savedQueries } = await import("@db-optima/database/schema");
 
-export interface PipelineStep {
-  type: PipelineStepType;
-  table?: string;
-  alias?: string;
-  leftKey?: string;
-  rightKey?: string;
-  condition?: string;
-  status: PipelineStepStatus;
-}
+    const [query] = await db
+      .select()
+      .from(savedQueries)
+      .where(eq(savedQueries.id, params.id))
+      .limit(1);
 
-export interface QueryResult {
-  columns: string[];
-  values: CellValue[][];
-}
+    if (!query) {
+      return NextResponse.json(
+        { error: "Not found", message: "Query not found" },
+        { status: 404 }
+      );
+    }
 
-// ── AI / Gemini ────────────────────────────────────────────────
-export type IssueSeverity = "high" | "medium" | "low";
-
-export interface QueryIssue {
-  severity: IssueSeverity;
-  description: string;
-}
-
-export interface OptimizationResult {
-  issues: QueryIssue[];
-  optimized_sql: string;
-  explanation: string;
-  index_statements: string[];
-  scan_type_before: string;
-  scan_type_after: string;
-  result_equivalence: {
-    equivalent: boolean;
-    reasoning: string;
-  };
-}
-
-// ── API Request / Response shapes (validated with Zod) ────────
-export interface AnalyzeRequestBody {
-  sql: string;
-  schema: string; // human-readable schema string sent to Gemini
-  explainPlan?: string; // real EXPLAIN QUERY PLAN output from sql.js, if available
-}
-
-export interface SuggestIndexesRequestBody {
-  sql: string;
-  schema: string;
-}
-
-// ── Performance Chart ──────────────────────────────────────────
-export interface PerfDataPoint {
-  rows: number;
-  seqMs: number;
-  idxMs: number;
-}
-
-// ── Index verification (real sql.js EXPLAIN QUERY PLAN before/after) ──
-export interface PlanRow {
-  id: number;
-  parent: number;
-  detail: string;
-}
-
-export interface ExplainResult {
-  raw: PlanRow[];
-  usesIndex: boolean;
-  usesSeqScan: boolean;
-  summary: string;
-}
-
-export interface VerifyIndexResult {
-  before: ExplainResult;
-  after: ExplainResult;
-  beforeMs: number;
-  afterMs: number;
-}
-
-// ── Saved / shared queries ─────────────────────────────────────
-export interface SavedQuery {
-  id: string;
-  name: string;
-  sql: string;
-  schemaJson: TableData;
-  createdAt?: string;
+    return NextResponse.json(query);
+  } catch (err) {
+    console.error("[/api/queries/[id] GET]", err);
+    return NextResponse.json(
+      { error: "Failed to fetch query", message: (err as Error).message },
+      { status: 500 }
+    );
+  }
 }

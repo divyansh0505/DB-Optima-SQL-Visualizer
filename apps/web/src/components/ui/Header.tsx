@@ -25,6 +25,12 @@ export function Header() {
     error,
     animSpeed,
     setAnimSpeed,
+    visualizerSQL,
+    tableData,
+    saveStatus,
+    setSaveStatus,
+    setSavedQueryId,
+    setSaveError,
   } = useStore();
 
   const statusState = isRunning ? "running" : error ? "error" : "idle";
@@ -156,6 +162,48 @@ export function Header() {
             title="Animation speed"
           />
         </div>
+
+        {/* Save & Share Button */}
+        <motion.button
+          whileHover={{ scale: 1.04 }}
+          whileTap={{ scale: 0.96 }}
+          onClick={async () => {
+            try {
+              setSaveStatus("saving");
+              setSaveError(null);
+              const res = await fetch("/api/queries", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  name: "SQL Session Snapshot",
+                  sql: visualizerSQL,
+                  schemaJson: tableData,
+                }),
+              });
+              const data = await res.json();
+              if (!res.ok) throw new Error(data.message || data.error || "Save failed");
+              setSavedQueryId(data.id);
+              setSaveStatus("saved");
+              const shareUrl = `${window.location.origin}/q/${data.id}`;
+              await navigator.clipboard.writeText(shareUrl);
+              alert(`Snapshot saved! Share link copied to clipboard:\n${shareUrl}`);
+            } catch (err: any) {
+              setSaveStatus("error");
+              setSaveError(err.message);
+              alert(`Could not save query: ${err.message}\n(Make sure PostgreSQL is running with DATABASE_URL configured)`);
+            }
+          }}
+          className="btn-secondary !py-1.5 !px-3 !text-xs flex items-center gap-1.5 font-medium"
+          style={{
+            borderColor: "var(--border2)",
+            background: "var(--surface3)",
+            color: "var(--text)",
+          }}
+          title="Save current schema + query and generate a share link"
+        >
+          <span>🔗</span>
+          <span>{saveStatus === "saving" ? "Saving…" : "Save & Share"}</span>
+        </motion.button>
 
         <div
           className="flex items-center gap-2 px-3 py-1.5 rounded-lg"
