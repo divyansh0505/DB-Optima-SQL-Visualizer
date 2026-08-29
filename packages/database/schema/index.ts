@@ -1,6 +1,18 @@
 import { pgTable, serial, text, timestamp, jsonb } from "drizzle-orm/pg-core";
 
 /**
+ * Users — registered user accounts for authentication.
+ */
+export const users = pgTable("users", {
+  id:           text("id").primaryKey(),
+  name:         text("name").notNull(),
+  email:        text("email").notNull().unique(),
+  passwordHash: text("password_hash").notNull(),
+  createdAt:    timestamp("created_at").defaultNow(),
+  updatedAt:    timestamp("updated_at").defaultNow(),
+});
+
+/**
  * Saved queries — lets users bookmark and reload their work.
  *
  * `id` is an opaque random string (see generateSavedQueryId in
@@ -15,6 +27,7 @@ export const savedQueries = pgTable("saved_queries", {
   name:        text("name").notNull(),
   sql:         text("sql").notNull(),
   schemaJson:  jsonb("schema_json"),               // TableData snapshot
+  userId:      text("user_id").references(() => users.id), // Optional owner
   createdAt:   timestamp("created_at").defaultNow(),
   updatedAt:   timestamp("updated_at").defaultNow(),
 });

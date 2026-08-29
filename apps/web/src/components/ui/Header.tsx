@@ -1,9 +1,12 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { create } from "zustand";
 import { useStore } from "@/store/useStore";
+import { useAuth } from "@/store/useAuth";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
-import { motion } from "framer-motion";
+import { AuthModal } from "@/components/auth/AuthModal";
+import { motion, AnimatePresence } from "framer-motion";
 
 const TABS = [
   { id: "visualize", label: "⬡ Visualize" },
@@ -33,6 +36,13 @@ export function Header() {
     setSaveError,
   } = useStore();
 
+  const { user, isAuthenticated, isLoading: authLoading, openAuthModal, logout, checkSession } = useAuth();
+  const [showUserMenu, setShowUserMenu] = useState(false);
+
+  useEffect(() => {
+    checkSession();
+  }, []);
+
   const statusState = isRunning ? "running" : error ? "error" : "idle";
   const statusLabel = isRunning ? "Running…" : error ? "Error" : "Idle";
   const dotColor =
@@ -42,203 +52,282 @@ export function Header() {
       ? "var(--error)"
       : "var(--success)";
 
-  return (
-    <header
-      className="h-16 flex items-center justify-between px-5 gap-3 flex-shrink-0 z-40 relative"
-      style={{
-        background: "var(--surface)",
-        backdropFilter: "blur(20px)",
-        WebkitBackdropFilter: "blur(20px)",
-        borderBottom: "1px solid var(--border)",
-        boxShadow:
-          "0 1px 0 0 rgba(129,140,248,0.08), 0 4px 24px -4px rgba(0,0,0,0.3)",
-      }}
-    >
-      {/* Brand */}
-      <div className="flex items-center gap-2.5 font-bold text-sm tracking-tight select-none">
-        <motion.div
-          className="w-9 h-9 rounded-md flex items-center justify-center text-base cursor-pointer"
-          style={{
-            background:
-              "linear-gradient(155deg, var(--accent), var(--accent-violet))",
-            boxShadow:
-              "0 4px 12px -3px color-mix(in srgb, var(--accent) 55%, transparent)",
-          }}
-          whileHover={{
-            scale: 1.12,
-            boxShadow:
-              "0 0 24px -2px rgba(129,140,248,0.5), 0 4px 12px -3px rgba(129,140,248,0.4)",
-          }}
-          whileTap={{ scale: 0.95 }}
-          transition={{ type: "spring", stiffness: 400, damping: 15 }}
-        >
-          ⚡
-        </motion.div>
-        <span className="text-[15px]">
-          DB<span className="text-[var(--accent)]">Optima</span>
-        </span>
-        <span
-          className="ml-1 hidden sm:inline-flex items-center gap-1.5 text-[9.5px] font-bold uppercase tracking-wider px-2 py-1 rounded-md border"
-          style={{
-            color: "var(--success)",
-            borderColor:
-              "color-mix(in srgb, var(--success) 40%, transparent)",
-            background:
-              "color-mix(in srgb, var(--success) 10%, transparent)",
-          }}
-          title="Every number this app shows — timings, scan types, speedups — comes from a real SQLite engine running in your browser, not a simulation or a guess."
-        >
-          <span className="w-1.5 h-1.5 rounded-sm bg-[var(--success)]" />
-          measured, not simulated
-        </span>
-      </div>
+  const initial = user?.name ? user.name.charAt(0).toUpperCase() : "U";
 
-      {/* Tabs — segmented pill control so the active section is unmistakable */}
-      <nav
-        className="flex gap-1 p-1 rounded-md flex-shrink-0 relative"
+  return (
+    <>
+      <header
+        className="h-16 flex items-center justify-between px-5 gap-3 flex-shrink-0 z-40 relative"
         style={{
-          background: "var(--surface3)",
-          border: "1px solid var(--border)",
+          background: "var(--surface)",
+          backdropFilter: "blur(20px)",
+          WebkitBackdropFilter: "blur(20px)",
+          borderBottom: "1px solid var(--border)",
+          boxShadow:
+            "0 1px 0 0 rgba(129,140,248,0.08), 0 4px 24px -4px rgba(0,0,0,0.3)",
         }}
       >
-        {TABS.map((t) => {
-          const active = tab === t.id;
-          return (
-            <button
-              key={t.id}
-              onClick={() => setTab(t.id)}
-              className="relative px-4 py-2 text-xs font-semibold rounded-lg transition-colors duration-150 z-[1]"
-              style={{
-                color: active ? "var(--accent)" : "var(--muted)",
-                background: "transparent",
-                border: "1px solid transparent",
-              }}
-            >
-              {/* Sliding indicator follows the active tab */}
-              {active && (
-                <motion.div
-                  layoutId="tab-indicator"
-                  className="absolute inset-0 rounded-lg"
-                  style={{
-                    background: "var(--surface)",
-                    border: "1px solid var(--border2)",
-                    boxShadow:
-                      "var(--shadow-glow), 0 2px 8px -2px rgba(0,0,0,0.3)",
-                  }}
-                  transition={{
-                    type: "spring",
-                    stiffness: 380,
-                    damping: 30,
-                  }}
-                />
-              )}
-              <span className="relative z-[2]">{t.label}</span>
-            </button>
-          );
-        })}
-      </nav>
-
-      {/* Controls */}
-      <div className="flex items-center gap-2.5">
-        <ThemeToggle />
-
-        <div
-          className="flex items-center gap-2 text-xs text-[var(--muted)] px-3 py-1.5 rounded-lg"
-          style={{
-            background: "var(--surface3)",
-            border: "1px solid var(--border)",
-          }}
-        >
-          <span className="font-medium">Speed</span>
-          <input
-            type="range"
-            min={1}
-            max={10}
-            value={Math.round(11 - animSpeed / 80)}
-            onChange={(e) =>
-              setAnimSpeed((11 - Number(e.target.value)) * 80)
-            }
-            className="w-20 cursor-pointer accent-[var(--accent)]"
-            title="Animation speed"
-          />
-        </div>
-
-        {/* Save & Share Button */}
-        <motion.button
-          whileHover={{ scale: 1.04 }}
-          whileTap={{ scale: 0.96 }}
-          onClick={async () => {
-            try {
-              setSaveStatus("saving");
-              setSaveError(null);
-              const res = await fetch("/api/queries", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  name: "SQL Session Snapshot",
-                  sql: visualizerSQL,
-                  schemaJson: tableData,
-                }),
-              });
-              const data = await res.json();
-              if (!res.ok) throw new Error(data.message || data.error || "Save failed");
-              setSavedQueryId(data.id);
-              setSaveStatus("saved");
-              const shareUrl = `${window.location.origin}/q/${data.id}`;
-              await navigator.clipboard.writeText(shareUrl);
-              alert(`Snapshot saved! Share link copied to clipboard:\n${shareUrl}`);
-            } catch (err: any) {
-              setSaveStatus("error");
-              setSaveError(err.message);
-              alert(`Could not save query: ${err.message}\n(Make sure PostgreSQL is running with DATABASE_URL configured)`);
-            }
-          }}
-          className="btn-secondary !py-1.5 !px-3 !text-xs flex items-center gap-1.5 font-medium"
-          style={{
-            borderColor: "var(--border2)",
-            background: "var(--surface3)",
-            color: "var(--text)",
-          }}
-          title="Save current schema + query and generate a share link"
-        >
-          <span>🔗</span>
-          <span>{saveStatus === "saving" ? "Saving…" : "Save & Share"}</span>
-        </motion.button>
-
-        <div
-          className="flex items-center gap-2 px-3 py-1.5 rounded-lg"
-          style={{
-            background: "var(--surface3)",
-            border: "1px solid var(--border)",
-          }}
-        >
-          {/* Pulsing status indicator */}
+        {/* Brand */}
+        <div className="flex items-center gap-2.5 font-bold text-sm tracking-tight select-none">
           <motion.div
-            className="w-2 h-2 rounded-full flex-shrink-0"
-            style={{ backgroundColor: dotColor }}
-            animate={
-              statusState === "running"
-                ? {
-                    scale: [1, 1.5, 1],
-                    boxShadow: [
-                      `0 0 0px ${dotColor}`,
-                      `0 0 8px ${dotColor}`,
-                      `0 0 0px ${dotColor}`,
-                    ],
-                  }
-                : { scale: 1, boxShadow: `0 0 4px ${dotColor}` }
-            }
-            transition={
-              statusState === "running"
-                ? { duration: 1.2, repeat: Infinity, ease: "easeInOut" }
-                : { duration: 0.3 }
-            }
-          />
-          <span className="text-xs font-medium text-[var(--muted)]">
-            {statusLabel}
+            className="w-9 h-9 rounded-md flex items-center justify-center text-base cursor-pointer"
+            style={{
+              background:
+                "linear-gradient(155deg, var(--accent), var(--accent-violet))",
+              boxShadow:
+                "0 4px 12px -3px color-mix(in srgb, var(--accent) 55%, transparent)",
+            }}
+            whileHover={{
+              scale: 1.12,
+              boxShadow:
+                "0 0 24px -2px rgba(129,140,248,0.5), 0 4px 12px -3px rgba(129,140,248,0.4)",
+            }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: "spring", stiffness: 400, damping: 15 }}
+          >
+            ⚡
+          </motion.div>
+          <span className="text-[15px]">
+            DB<span className="text-[var(--accent)]">Optima</span>
+          </span>
+          <span
+            className="ml-1 hidden sm:inline-flex items-center gap-1.5 text-[9.5px] font-bold uppercase tracking-wider px-2 py-1 rounded-md border"
+            style={{
+              color: "var(--success)",
+              borderColor:
+                "color-mix(in srgb, var(--success) 40%, transparent)",
+              background:
+                "color-mix(in srgb, var(--success) 10%, transparent)",
+            }}
+            title="Every number this app shows — timings, scan types, speedups — comes from a real SQLite engine running in your browser, not a simulation or a guess."
+          >
+            <span className="w-1.5 h-1.5 rounded-sm bg-[var(--success)]" />
+            measured, not simulated
           </span>
         </div>
-      </div>
-    </header>
+
+        {/* Tabs — segmented pill control */}
+        <nav
+          className="flex gap-1 p-1 rounded-md flex-shrink-0 relative"
+          style={{
+            background: "var(--surface3)",
+            border: "1px solid var(--border)",
+          }}
+        >
+          {TABS.map((t) => {
+            const active = tab === t.id;
+            return (
+              <button
+                key={t.id}
+                onClick={() => setTab(t.id)}
+                className="relative px-4 py-2 text-xs font-semibold rounded-lg transition-colors duration-150 z-[1]"
+                style={{
+                  color: active ? "var(--accent)" : "var(--muted)",
+                  background: "transparent",
+                  border: "1px solid transparent",
+                }}
+              >
+                {active && (
+                  <motion.div
+                    layoutId="tab-indicator"
+                    className="absolute inset-0 rounded-lg"
+                    style={{
+                      background: "var(--surface)",
+                      border: "1px solid var(--border2)",
+                      boxShadow:
+                        "var(--shadow-glow), 0 2px 8px -2px rgba(0,0,0,0.3)",
+                    }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 380,
+                      damping: 30,
+                    }}
+                  />
+                )}
+                <span className="relative z-[2]">{t.label}</span>
+              </button>
+            );
+          })}
+        </nav>
+
+        {/* Controls */}
+        <div className="flex items-center gap-2.5">
+          <ThemeToggle />
+
+          <div
+            className="flex items-center gap-2 text-xs text-[var(--muted)] px-3 py-1.5 rounded-lg"
+            style={{
+              background: "var(--surface3)",
+              border: "1px solid var(--border)",
+            }}
+          >
+            <span className="font-medium">Speed</span>
+            <input
+              type="range"
+              min={1}
+              max={10}
+              value={Math.round(11 - animSpeed / 80)}
+              onChange={(e) =>
+                setAnimSpeed((11 - Number(e.target.value)) * 80)
+              }
+              className="w-20 cursor-pointer accent-[var(--accent)]"
+              title="Animation speed"
+            />
+          </div>
+
+          {/* Save & Share Button */}
+          <motion.button
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.96 }}
+            onClick={async () => {
+              try {
+                setSaveStatus("saving");
+                setSaveError(null);
+                const res = await fetch("/api/queries", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    name: "SQL Session Snapshot",
+                    sql: visualizerSQL,
+                    schemaJson: tableData,
+                  }),
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message || data.error || "Save failed");
+                setSavedQueryId(data.id);
+                setSaveStatus("saved");
+                const shareUrl = `${window.location.origin}/q/${data.id}`;
+                await navigator.clipboard.writeText(shareUrl);
+                alert(`Snapshot saved! Share link copied to clipboard:\n${shareUrl}`);
+              } catch (err: any) {
+                setSaveStatus("error");
+                setSaveError(err.message);
+                alert(`Could not save query: ${err.message}`);
+              }
+            }}
+            className="btn-secondary !py-1.5 !px-3 !text-xs flex items-center gap-1.5 font-medium"
+            style={{
+              borderColor: "var(--border2)",
+              background: "var(--surface3)",
+              color: "var(--text)",
+            }}
+            title="Save current schema + query and generate a share link"
+          >
+            <span>🔗</span>
+            <span>{saveStatus === "saving" ? "Saving…" : "Save & Share"}</span>
+          </motion.button>
+
+          {/* User Auth Section */}
+          {!authLoading && (
+            <>
+              {isAuthenticated && user ? (
+                <div className="relative">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setShowUserMenu(!showUserMenu)}
+                    className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border text-xs font-medium transition"
+                    style={{
+                      background: "var(--surface3)",
+                      borderColor: "var(--border2)",
+                      color: "var(--text)",
+                    }}
+                  >
+                    <div
+                      className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-sm"
+                      style={{
+                        background: "linear-gradient(135deg, var(--accent), var(--accent-violet))",
+                      }}
+                    >
+                      {initial}
+                    </div>
+                    <span className="max-w-[100px] truncate hidden md:inline">{user.name}</span>
+                    <span className="text-[9px] text-[var(--muted)]">▼</span>
+                  </motion.button>
+
+                  <AnimatePresence>
+                    {showUserMenu && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.95, y: 6 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: 6 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute right-0 mt-2 w-48 rounded-xl p-2 shadow-2xl z-50 border"
+                        style={{
+                          background: "var(--surface)",
+                          borderColor: "var(--border2)",
+                        }}
+                      >
+                        <div className="px-2.5 py-2 border-b border-[var(--border)] mb-1">
+                          <p className="text-xs font-semibold truncate text-[var(--text)]">{user.name}</p>
+                          <p className="text-[10.5px] text-[var(--muted)] truncate">{user.email}</p>
+                        </div>
+                        <button
+                          onClick={async () => {
+                            setShowUserMenu(false);
+                            await logout();
+                          }}
+                          className="w-full text-left px-2.5 py-1.5 rounded-lg text-xs flex items-center gap-2 text-[var(--error)] hover:bg-[var(--surface2)] transition"
+                        >
+                          <span>🚪</span>
+                          <span>Sign Out</span>
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ) : (
+                <motion.button
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.96 }}
+                  onClick={() => openAuthModal("signin")}
+                  className="btn-primary !py-1.5 !px-3 !text-xs flex items-center gap-1.5 font-medium"
+                >
+                  <span>👤</span>
+                  <span>Sign In</span>
+                </motion.button>
+              )}
+            </>
+          )}
+
+          {/* Engine Status Indicator */}
+          <div
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg"
+            style={{
+              background: "var(--surface3)",
+              border: "1px solid var(--border)",
+            }}
+          >
+            <motion.div
+              className="w-2 h-2 rounded-full flex-shrink-0"
+              style={{ backgroundColor: dotColor }}
+              animate={
+                statusState === "running"
+                  ? {
+                      scale: [1, 1.5, 1],
+                      boxShadow: [
+                        `0 0 0px ${dotColor}`,
+                        `0 0 8px ${dotColor}`,
+                        `0 0 0px ${dotColor}`,
+                      ],
+                    }
+                  : { scale: 1, boxShadow: `0 0 4px ${dotColor}` }
+              }
+              transition={
+                statusState === "running"
+                  ? { duration: 1.2, repeat: Infinity, ease: "easeInOut" }
+                  : { duration: 0.3 }
+              }
+            />
+            <span className="text-xs font-medium text-[var(--muted)]">
+              {statusLabel}
+            </span>
+          </div>
+        </div>
+      </header>
+
+      {/* Global Authentication Modal */}
+      <AuthModal />
+    </>
   );
 }

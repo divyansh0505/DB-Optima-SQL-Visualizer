@@ -1,0 +1,23 @@
+{
+  "usr_51985e5b98d28a82": {
+    "id": "usr_51985e5b98d28a82",
+    "name": "Dev User",
+    "email": "dev@dboptima.io",
+    "passwordHash": "$2b$10$EUdttTwXVJGCENULJ4QLsuLWJQlziUjK7mlWNc2Vh16GQlT4srT7m",
+    "createdAt": "2026-08-29T15:06:57.495Z"
+  },
+  "usr_5e2549e32dd1a811": {
+    "id": "usr_5e2549e32dd1a811",
+    "name": "Divyansh",
+    "email": "divyansh@gmail.com",
+    "passwordHash": "$2b$10$reVArHiFIZpQIJbN3OZaQ.dk0IuG1Yjl/BDd17TD8LA1eaJD04eTO",
+    "createdAt": "2026-08-29T15:09:16.677Z"
+  },
+  "usr_2066cc5d4f44ef81": {
+    "id": "usr_2066cc5d4f44ef81",
+    "name": "Demo Explorer",
+    "email": "demo@dboptima.io",
+    "passwordHash": "$2b$10$U7gmp65HmnBIUbVsE6TPM.192hdvnqHKatqVDQkfl.tohN.717dce",
+    "createdAt": "2026-08-29T15:19:48.161Z"
+  }
+}
